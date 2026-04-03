@@ -15,12 +15,12 @@ function initCharts() {
     scales: {
       x: {
         display: true,
-        grid: { color: 'rgba(46,50,64,0.6)' },
-        ticks: { color: '#8a8f9c', maxTicksLimit: 10, font: { size: 10 } },
+        grid: { color: 'rgba(36,51,86,0.8)' },
+        ticks: { color: '#9a9a9a', maxTicksLimit: 10, font: { size: 10 } },
       },
       y: {
-        grid: { color: 'rgba(46,50,64,0.6)' },
-        ticks: { color: '#8a8f9c', font: { size: 10 } },
+        grid: { color: 'rgba(36,51,86,0.8)' },
+        ticks: { color: '#9a9a9a', font: { size: 10 } },
       },
     },
     plugins: {
@@ -35,8 +35,8 @@ function initCharts() {
       labels: [],
       datasets: [{
         data: [],
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59,130,246,0.08)',
+        borderColor: '#fca311',
+        backgroundColor: 'rgba(252,163,17,0.08)',
         borderWidth: 2,
         pointRadius: 0,
         tension: 0.3,
@@ -59,8 +59,8 @@ function initCharts() {
       labels: [],
       datasets: [{
         data: [],
-        borderColor: '#ef4444',
-        backgroundColor: 'rgba(239,68,68,0.08)',
+        borderColor: '#e5e5e5',
+        backgroundColor: 'rgba(229,229,229,0.08)',
         borderWidth: 2,
         pointRadius: 0,
         tension: 0.3,

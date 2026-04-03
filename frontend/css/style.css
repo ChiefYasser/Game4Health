@@ -6,18 +6,18 @@
 }
 
 :root {
-  --bg: #0f1117;
-  --surface: #1a1d27;
-  --surface-2: #232730;
-  --border: #2e3240;
-  --text: #e1e4ea;
-  --text-muted: #8a8f9c;
-  --primary: #3b82f6;
-  --primary-dim: #2563eb;
+  --bg: #000000;
+  --surface: #14213d;
+  --surface-2: #1b2a4a;
+  --border: #243356;
+  --text: #e5e5e5;
+  --text-muted: #9a9a9a;
+  --primary: #fca311;
+  --primary-dim: #e09000;
   --danger: #ef4444;
   --success: #22c55e;
-  --warning: #eab308;
-  --accent: #06b6d4;
+  --warning: #fca311;
+  --accent: #fca311;
   --radius: 8px;
   --font: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
 }
@@ -85,7 +85,7 @@ body {
 }
 
 .mqtt-badge {
-  background: rgba(6, 182, 212, 0.15);
+  background: rgba(252, 163, 17, 0.15);
   color: var(--accent);
 }
 
@@ -165,11 +165,12 @@ body {
 
 .btn-primary {
   background: var(--primary);
-  color: #fff;
+  color: #000000;
 }
 
 .btn-primary:hover {
   background: var(--primary-dim);
+  color: #000000;
 }
 
 .btn-secondary {
