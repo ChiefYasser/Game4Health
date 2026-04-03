@@ -89,10 +89,103 @@ body {
   color: var(--accent);
 }
 
+/* === Setup Page === */
+.setup-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+/* === Scenario Section === */
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.scenario-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.scenario-card:hover {
+  border-color: var(--primary);
+  background: var(--surface-2);
+}
+
+.scenario-card.selected {
+  border-color: var(--primary);
+  background: rgba(252, 163, 17, 0.08);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.scenario-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 14px;
+  color: var(--text-muted);
+  transition: color 0.25s;
+}
+
+.scenario-card:hover .scenario-icon,
+.scenario-card.selected .scenario-icon {
+  color: var(--primary);
+}
+
+.scenario-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.scenario-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* === Selected Scenario Bar === */
+.selected-scenario-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(252, 163, 17, 0.08);
+  border: 1px solid rgba(252, 163, 17, 0.25);
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.selected-scenario-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.selected-scenario-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
 /* === Panel === */
 .panel {
-  max-width: 900px;
-  margin: 40px auto;
   padding: 32px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -104,6 +197,75 @@ body {
   font-weight: 600;
   margin-bottom: 24px;
   color: var(--text);
+}
+
+/* === Scenario Banner (Dashboard) === */
+.scenario-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+}
+
+.scenario-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.scenario-banner-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.scenario-banner-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.scenario-banner-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.scenario-banner-patient {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.btn-vr {
+  padding: 8px 20px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  background: var(--primary);
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+}
+
+.btn-vr:hover {
+  background: var(--primary-dim);
+}
+
+.btn-vr.launched {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  cursor: default;
 }
 
 /* === Form === */
@@ -567,11 +729,17 @@ body {
   .bottom-row {
     grid-template-columns: 1fr;
   }
+  .scenario-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 700px) {
   .header {
     padding: 12px 16px;
+  }
+  .setup-page {
+    padding: 16px;
   }
   .dashboard {
     padding: 16px;
@@ -584,5 +752,13 @@ body {
   }
   .report-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .scenario-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .scenario-banner {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
   }
 }

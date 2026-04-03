@@ -5,6 +5,67 @@ let hrChart = null;
 let stressChart = null;
 let durationInterval = null;
 let sessionStartTime = null;
+let selectedScenario = null;
+
+// ── Scenario Definitions ────────────────────────────────
+const SCENARIOS = {
+  claustrophobia: {
+    label: 'Claustrophobia',
+    events: [
+      { value: 'room_shrinking', label: 'Room Shrinking' },
+      { value: 'door_locked', label: 'Door Locked' },
+      { value: 'walls_closing', label: 'Walls Closing In' },
+      { value: 'lights_off', label: 'Lights Off' },
+      { value: 'elevator_stuck', label: 'Elevator Stuck' },
+      { value: 'breathing_exercise', label: 'Breathing Exercise' },
+      { value: 'door_opened', label: 'Door Opened' },
+      { value: 'session_complete', label: 'Session Complete' },
+    ],
+    demoEvents: ['door_locked', 'room_shrinking', 'walls_closing', 'lights_off', 'breathing_exercise', 'door_opened', 'session_complete'],
+  },
+  acrophobia: {
+    label: 'Acrophobia',
+    events: [
+      { value: 'height_increase', label: 'Height Increase' },
+      { value: 'bridge_crossing', label: 'Bridge Crossing' },
+      { value: 'ledge_approach', label: 'Ledge Approach' },
+      { value: 'glass_floor', label: 'Glass Floor' },
+      { value: 'wind_gust', label: 'Wind Gust' },
+      { value: 'safe_platform', label: 'Safe Platform' },
+      { value: 'descent_begin', label: 'Descent Begin' },
+      { value: 'session_complete', label: 'Session Complete' },
+    ],
+    demoEvents: ['height_increase', 'bridge_crossing', 'ledge_approach', 'glass_floor', 'wind_gust', 'safe_platform', 'session_complete'],
+  },
+  arachnophobia: {
+    label: 'Arachnophobia',
+    events: [
+      { value: 'spider_distant', label: 'Spider Distant' },
+      { value: 'spider_approaching', label: 'Spider Approaching' },
+      { value: 'spider_on_wall', label: 'Spider On Wall' },
+      { value: 'spider_nearby', label: 'Spider Nearby' },
+      { value: 'multiple_spiders', label: 'Multiple Spiders' },
+      { value: 'spider_removed', label: 'Spider Removed' },
+      { value: 'safe_zone', label: 'Safe Zone' },
+      { value: 'session_complete', label: 'Session Complete' },
+    ],
+    demoEvents: ['spider_distant', 'spider_approaching', 'spider_on_wall', 'spider_nearby', 'multiple_spiders', 'spider_removed', 'safe_zone', 'session_complete'],
+  },
+  glossophobia: {
+    label: 'Glossophobia',
+    events: [
+      { value: 'audience_small', label: 'Small Audience' },
+      { value: 'audience_growing', label: 'Audience Growing' },
+      { value: 'spotlight_on', label: 'Spotlight On' },
+      { value: 'audience_staring', label: 'Audience Staring' },
+      { value: 'heckler', label: 'Heckler' },
+      { value: 'applause', label: 'Applause' },
+      { value: 'speech_complete', label: 'Speech Complete' },
+      { value: 'session_complete', label: 'Session Complete' },
+    ],
+    demoEvents: ['audience_small', 'audience_growing', 'spotlight_on', 'audience_staring', 'heckler', 'applause', 'session_complete'],
+  },
+};
 
 // ── Chart Setup ─────────────────────────────────────────
 function initCharts() {
@@ -114,14 +175,27 @@ function updateStressMetric(stress) {
 
 // ── Events List ─────────────────────────────────────────
 const eventColors = {
-  enemy_encounter: 'danger',
-  jump_scare: 'danger',
-  player_death: 'danger',
-  puzzle_start: 'info',
-  puzzle_complete: 'success',
-  safe_zone: 'success',
-  level_change: 'warning',
-  game_over: 'warning',
+  // Danger events
+  walls_closing: 'danger', lights_off: 'danger', door_locked: 'danger',
+  elevator_stuck: 'danger', room_shrinking: 'danger',
+  ledge_approach: 'danger', wind_gust: 'danger', glass_floor: 'danger',
+  spider_nearby: 'danger', multiple_spiders: 'danger', spider_on_wall: 'danger',
+  audience_staring: 'danger', heckler: 'danger', spotlight_on: 'danger',
+  // Warning events
+  height_increase: 'warning', bridge_crossing: 'warning',
+  spider_approaching: 'warning', spider_distant: 'warning',
+  audience_growing: 'warning', audience_small: 'warning',
+  // Success events
+  breathing_exercise: 'success', door_opened: 'success',
+  safe_platform: 'success', descent_begin: 'success',
+  spider_removed: 'success', safe_zone: 'success',
+  applause: 'success', speech_complete: 'success',
+  session_complete: 'success',
+  // Info
+  enemy_encounter: 'danger', jump_scare: 'danger', player_death: 'danger',
+  puzzle_start: 'info', puzzle_complete: 'success',
+  level_change: 'warning', game_over: 'warning',
+  vr_launched: 'success',
 };
 
 function formatEventType(type) {
@@ -178,6 +252,19 @@ async function apiGet(path) {
   return res.json();
 }
 
+// ── Populate Scenario Events Dropdown ───────────────────
+function populateEventDropdown(scenarioKey) {
+  const select = document.getElementById('simEventType');
+  select.innerHTML = '';
+  const events = SCENARIOS[scenarioKey]?.events || [];
+  events.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.value;
+    opt.textContent = e.label;
+    select.appendChild(opt);
+  });
+}
+
 // ── Socket Connection ───────────────────────────────────
 function connectDashboard(sid) {
   socket = io(API + '/dashboard');
@@ -194,7 +281,6 @@ function connectDashboard(sid) {
   });
 
   socket.on('session-state', (data) => {
-    // Hydrate charts with existing readings
     if (data.readings && data.readings.length > 0) {
       data.readings.forEach((r) => {
         const time = formatTime(r.timestamp);
@@ -204,13 +290,11 @@ function connectDashboard(sid) {
         }
       });
     }
-    // Hydrate events
     if (data.events && data.events.length > 0) {
       data.events.forEach((e) => {
         addEventToList(e.eventType, e.heartRateAtEvent, e.stressAtEvent, e.timestamp);
       });
     }
-    // Update session info
     if (data.session) {
       updateMetric('metricStatus', data.session.status, 'metric-value status-' + data.session.status);
       if (data.session.baselineHR) {
@@ -288,7 +372,7 @@ function showReport(report) {
       <div class="report-stat-value">${s.totalReadings}</div>
     </div>
     <div class="report-stat">
-      <div class="report-stat-label">Game Events</div>
+      <div class="report-stat-label">Session Events</div>
       <div class="report-stat-value">${s.totalGameEvents}</div>
     </div>
     <div class="report-stat">
@@ -306,8 +390,23 @@ function showReport(report) {
   panel.scrollIntoView({ behavior: 'smooth' });
 }
 
+// ── Scenario Card Selection ─────────────────────────────
+document.querySelectorAll('.scenario-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedScenario = card.dataset.scenario;
+
+    document.getElementById('selectedScenarioBar').style.display = 'flex';
+    document.getElementById('selectedScenarioName').textContent = SCENARIOS[selectedScenario].label;
+    document.getElementById('btnCreateSession').disabled = false;
+  });
+});
+
 // ── Session Creation ────────────────────────────────────
 document.getElementById('btnCreateSession').addEventListener('click', async () => {
+  if (!selectedScenario) return;
+
   const playerName = document.getElementById('playerName').value || 'Anonymous';
   const difficulty = document.getElementById('difficulty').value;
   const age = parseInt(document.getElementById('age').value);
@@ -320,7 +419,6 @@ document.getElementById('btnCreateSession').addEventListener('click', async () =
     return;
   }
 
-  // Create session
   const sessionRes = await apiPost('/api/sessions', { playerName, difficulty });
   if (!sessionRes.sessionId) {
     alert('Failed to create session: ' + (sessionRes.error || 'Unknown error'));
@@ -328,7 +426,6 @@ document.getElementById('btnCreateSession').addEventListener('click', async () =
   }
   sessionId = sessionRes.sessionId;
 
-  // Submit questionnaire
   await apiPost('/api/questionnaires/' + sessionId, {
     age,
     gender,
@@ -337,14 +434,29 @@ document.getElementById('btnCreateSession').addEventListener('click', async () =
     priorGamingExperience: 'casual',
   });
 
-  // Switch to dashboard view
-  document.getElementById('setupPanel').style.display = 'none';
+  // Switch to dashboard
+  document.getElementById('setupPage').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
+
+  // Set banner info
+  document.getElementById('bannerScenarioName').textContent = SCENARIOS[selectedScenario].label;
+  document.getElementById('bannerPatientName').textContent = playerName;
   updateMetric('metricStatus', 'Created', 'metric-value');
 
-  // Initialize charts and connect socket
+  // Populate events dropdown for this scenario
+  populateEventDropdown(selectedScenario);
+
   initCharts();
   connectDashboard(sessionId);
+});
+
+// ── Launch VR Button ────────────────────────────────────
+document.getElementById('btnLaunchVR').addEventListener('click', () => {
+  const btn = document.getElementById('btnLaunchVR');
+  btn.textContent = 'VR Session Running';
+  btn.classList.add('launched');
+
+  addEventToList('vr_launched', null, null, new Date());
 });
 
 // ── Calibration Button ──────────────────────────────────
@@ -369,8 +481,6 @@ document.getElementById('btnSimSensor').addEventListener('click', async () => {
   if (!sessionId) return;
   const heartRate = parseInt(document.getElementById('simHR').value) || 75;
   const res = await apiPost('/api/debug/simulate-sensor', { sessionId, heartRate });
-
-  // If still calibrating, manually update chart with calibration data
   if (res.reading && res.reading.phase === 'calibration') {
     const time = formatTime(new Date());
     addChartPoint(hrChart, time, heartRate, 60);
@@ -387,7 +497,7 @@ document.getElementById('btnSimBurst').addEventListener('click', async () => {
   }
 });
 
-// ── Simulation: Calm Session ────────────────────────────
+// ── Simulation: Calm Pattern ────────────────────────────
 document.getElementById('btnSimCalm').addEventListener('click', async () => {
   if (!sessionId) return;
   const calmPattern = [72, 71, 73, 70, 72, 74, 71, 73, 72, 70];
@@ -395,6 +505,55 @@ document.getElementById('btnSimCalm').addEventListener('click', async () => {
     await apiPost('/api/debug/simulate-sensor', { sessionId, heartRate: hr });
     await new Promise(r => setTimeout(r, 400));
   }
+});
+
+// ── Simulation: Full Demo ───────────────────────────────
+document.getElementById('btnSimFull').addEventListener('click', async () => {
+  if (!sessionId || !selectedScenario) return;
+  const btn = document.getElementById('btnSimFull');
+  btn.disabled = true;
+  btn.textContent = 'Running Demo...';
+
+  const scenario = SCENARIOS[selectedScenario];
+
+  // 1. Calibration (10 resting readings)
+  await apiPost('/api/debug/start-calibration', { sessionId });
+  updateMetric('metricStatus', 'Calibrating', 'metric-value status-calibrating');
+  document.getElementById('calibrationBar').style.display = 'flex';
+
+  const restingHRs = [71, 73, 70, 74, 72, 71, 73, 72, 70, 74];
+  for (const hr of restingHRs) {
+    await apiPost('/api/debug/simulate-sensor', { sessionId, heartRate: hr });
+    const time = formatTime(new Date());
+    addChartPoint(hrChart, time, hr, 60);
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  // 2. Active phase with scenario events — rising then falling stress
+  const activeHRs = [74, 78, 82, 88, 94, 100, 108, 115, 112, 105, 98, 92, 86, 80, 76, 73];
+  const eventTriggers = scenario.demoEvents;
+  const eventInterval = Math.floor(activeHRs.length / eventTriggers.length);
+
+  for (let i = 0; i < activeHRs.length; i++) {
+    await apiPost('/api/debug/simulate-sensor', { sessionId, heartRate: activeHRs[i] });
+
+    // Fire scenario event at intervals
+    const eventIdx = Math.floor(i / eventInterval);
+    if (i % eventInterval === 0 && eventIdx < eventTriggers.length) {
+      await apiPost('/api/debug/simulate-game-event', {
+        sessionId,
+        eventType: eventTriggers[eventIdx],
+      });
+    }
+
+    await new Promise(r => setTimeout(r, 500));
+  }
+
+  btn.textContent = 'Demo Complete';
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = 'Run Full Demo';
+  }, 3000);
 });
 
 // ── Simulation: Game Event ──────────────────────────────

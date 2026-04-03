@@ -22,55 +22,143 @@
     </div>
   </header>
 
-  <!-- Session Setup Panel -->
-  <section class="panel setup-panel" id="setupPanel">
-    <h2>Session Setup</h2>
-    <div class="form-grid">
-      <div class="form-group">
-        <label for="playerName">Player Name</label>
-        <input type="text" id="playerName" placeholder="Enter player name" value="">
-      </div>
-      <div class="form-group">
-        <label for="difficulty">Difficulty</label>
-        <select id="difficulty">
-          <option value="easy">Easy</option>
-          <option value="medium" selected>Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="age">Age</label>
-        <input type="number" id="age" placeholder="Age" min="5" max="99">
-      </div>
-      <div class="form-group">
-        <label for="gender">Gender</label>
-        <select id="gender">
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="currentMood">Current Mood</label>
-        <select id="currentMood">
-          <option value="calm">Calm</option>
-          <option value="neutral" selected>Neutral</option>
-          <option value="anxious">Anxious</option>
-          <option value="stressed">Stressed</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="phobiaLevel">Phobia Level (1-10)</label>
-        <input type="number" id="phobiaLevel" value="5" min="1" max="10">
+  <!-- Session Setup -->
+  <section class="setup-page" id="setupPage">
+
+    <!-- Scenario Selection -->
+    <div class="scenario-section">
+      <h2 class="section-title">Select VR Scenario</h2>
+      <div class="scenario-grid">
+
+        <div class="scenario-card" data-scenario="claustrophobia">
+          <div class="scenario-icon">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="8" y="4" width="32" height="40" rx="2"/>
+              <line x1="8" y1="16" x2="40" y2="16"/>
+              <line x1="8" y1="32" x2="40" y2="32"/>
+              <rect x="18" y="20" width="12" height="8" rx="1" stroke-dasharray="2 2"/>
+            </svg>
+          </div>
+          <div class="scenario-name">Claustrophobia</div>
+          <div class="scenario-desc">Enclosed spaces simulation</div>
+        </div>
+
+        <div class="scenario-card" data-scenario="acrophobia">
+          <div class="scenario-icon">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 44 L24 4 L44 44 Z"/>
+              <line x1="14" y1="28" x2="34" y2="28"/>
+              <line x1="10" y1="36" x2="38" y2="36"/>
+              <circle cx="24" cy="18" r="2" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="scenario-name">Acrophobia</div>
+          <div class="scenario-desc">Heights exposure therapy</div>
+        </div>
+
+        <div class="scenario-card" data-scenario="arachnophobia">
+          <div class="scenario-icon">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+              <ellipse cx="24" cy="22" rx="8" ry="6"/>
+              <circle cx="24" cy="14" r="4"/>
+              <path d="M16 20 L4 12M16 22 L2 24M16 24 L4 36"/>
+              <path d="M32 20 L44 12M32 22 L46 24M32 24 L44 36"/>
+              <circle cx="22" cy="13" r="1" fill="currentColor"/>
+              <circle cx="26" cy="13" r="1" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="scenario-name">Arachnophobia</div>
+          <div class="scenario-desc">Spider phobia exposure</div>
+        </div>
+
+        <div class="scenario-card" data-scenario="glossophobia">
+          <div class="scenario-icon">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="16" y="28" width="16" height="16" rx="1"/>
+              <line x1="24" y1="28" x2="24" y2="20"/>
+              <circle cx="12" cy="40" r="3"/>
+              <circle cx="36" cy="40" r="3"/>
+              <circle cx="8" cy="34" r="2.5"/>
+              <circle cx="40" cy="34" r="2.5"/>
+              <circle cx="24" cy="8" r="5"/>
+              <line x1="24" y1="13" x2="24" y2="20"/>
+              <line x1="20" y1="17" x2="28" y2="17"/>
+            </svg>
+          </div>
+          <div class="scenario-name">Glossophobia</div>
+          <div class="scenario-desc">Public speaking stress</div>
+        </div>
+
       </div>
     </div>
-    <div class="form-actions">
-      <button class="btn btn-primary" id="btnCreateSession">Start Session</button>
+
+    <!-- Patient Form -->
+    <div class="panel setup-panel" id="setupPanel">
+      <h2>Patient Information</h2>
+      <div class="selected-scenario-bar" id="selectedScenarioBar" style="display:none;">
+        <span class="selected-scenario-label">Scenario:</span>
+        <span class="selected-scenario-name" id="selectedScenarioName">--</span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="playerName">Patient Name</label>
+          <input type="text" id="playerName" placeholder="Enter patient name" value="">
+        </div>
+        <div class="form-group">
+          <label for="difficulty">Intensity Level</label>
+          <select id="difficulty">
+            <option value="easy">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="number" id="age" placeholder="Age" min="5" max="99">
+        </div>
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select id="gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="currentMood">Pre-Session Mood</label>
+          <select id="currentMood">
+            <option value="calm">Calm</option>
+            <option value="neutral" selected>Neutral</option>
+            <option value="anxious">Anxious</option>
+            <option value="stressed">Stressed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="phobiaLevel">Phobia Severity (1-10)</label>
+          <input type="number" id="phobiaLevel" value="5" min="1" max="10">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" id="btnCreateSession" disabled>Begin Session</button>
+      </div>
     </div>
+
   </section>
 
   <!-- Live Dashboard (hidden until session starts) -->
   <section class="dashboard" id="dashboard" style="display:none;">
+
+    <!-- Scenario Banner -->
+    <div class="scenario-banner" id="scenarioBanner">
+      <div class="scenario-banner-left">
+        <span class="scenario-banner-label">Active Scenario</span>
+        <span class="scenario-banner-name" id="bannerScenarioName">--</span>
+      </div>
+      <div class="scenario-banner-right">
+        <span class="scenario-banner-patient" id="bannerPatientName">--</span>
+        <button class="btn btn-vr" id="btnLaunchVR">Launch VR Session</button>
+      </div>
+    </div>
 
     <!-- Top Metrics Row -->
     <div class="metrics-row">
@@ -91,7 +179,7 @@
         <div class="metric-value" id="metricBaseline">-- <small>BPM</small></div>
       </div>
       <div class="metric-card">
-        <div class="metric-label">Difficulty</div>
+        <div class="metric-label">Intensity</div>
         <div class="metric-value" id="metricDifficulty">--</div>
       </div>
       <div class="metric-card">
@@ -124,9 +212,9 @@
     <!-- Bottom Row: Events + Controls -->
     <div class="bottom-row">
       <div class="events-panel">
-        <h3>Game Events</h3>
+        <h3>Session Events</h3>
         <div class="events-list" id="eventsList">
-          <div class="event-empty">Waiting for game events...</div>
+          <div class="event-empty">Waiting for session events...</div>
         </div>
       </div>
       <div class="controls-panel">
@@ -134,26 +222,18 @@
         <button class="btn btn-secondary" id="btnCalibrate">Start Calibration</button>
         <button class="btn btn-danger" id="btnEndSession">End Session</button>
         <hr>
-        <h3>Simulation</h3>
+        <h3>Sensor Simulation</h3>
         <div class="sim-group">
           <label for="simHR">Heart Rate</label>
           <input type="number" id="simHR" value="75" min="40" max="200">
           <button class="btn btn-outline" id="btnSimSensor">Send Reading</button>
         </div>
         <button class="btn btn-outline" id="btnSimBurst">Simulate Stress Burst</button>
-        <button class="btn btn-outline" id="btnSimCalm">Simulate Calm Session</button>
+        <button class="btn btn-outline" id="btnSimCalm">Simulate Calm Pattern</button>
+        <button class="btn btn-outline" id="btnSimFull">Run Full Demo</button>
         <hr>
-        <h3>Simulate Game Event</h3>
-        <select id="simEventType">
-          <option value="enemy_encounter">Enemy Encounter</option>
-          <option value="jump_scare">Jump Scare</option>
-          <option value="puzzle_start">Puzzle Start</option>
-          <option value="puzzle_complete">Puzzle Complete</option>
-          <option value="safe_zone">Safe Zone</option>
-          <option value="level_change">Level Change</option>
-          <option value="player_death">Player Death</option>
-          <option value="game_over">Game Over</option>
-        </select>
+        <h3>Scenario Events</h3>
+        <select id="simEventType"></select>
         <button class="btn btn-outline" id="btnSimEvent">Send Event</button>
       </div>
     </div>
