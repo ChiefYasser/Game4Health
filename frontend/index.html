@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iHealthPass - NeuroPhobia VR Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <h1 class="logo">iHealthPass</h1>
+      <span class="subtitle">NeuroPhobia VR Monitor</span>
+    </div>
+    <div class="header-right">
+      <span class="connection-badge" id="connectionBadge">Disconnected</span>
+      <span class="mqtt-badge" id="mqttBadge">MQTT</span>
+    </div>
+  </header>
+
+  <!-- Session Setup Panel -->
+  <section class="panel setup-panel" id="setupPanel">
+    <h2>Session Setup</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="playerName">Player Name</label>
+        <input type="text" id="playerName" placeholder="Enter player name" value="">
+      </div>
+      <div class="form-group">
+        <label for="difficulty">Difficulty</label>
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="age">Age</label>
+        <input type="number" id="age" placeholder="Age" min="5" max="99">
+      </div>
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select id="gender">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="currentMood">Current Mood</label>
+        <select id="currentMood">
+          <option value="calm">Calm</option>
+          <option value="neutral" selected>Neutral</option>
+          <option value="anxious">Anxious</option>
+          <option value="stressed">Stressed</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="phobiaLevel">Phobia Level (1-10)</label>
+        <input type="number" id="phobiaLevel" value="5" min="1" max="10">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" id="btnCreateSession">Start Session</button>
+    </div>
+  </section>
+
+  <!-- Live Dashboard (hidden until session starts) -->
+  <section class="dashboard" id="dashboard" style="display:none;">
+
+    <!-- Top Metrics Row -->
+    <div class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-label">Session Status</div>
+        <div class="metric-value" id="metricStatus">--</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Heart Rate</div>
+        <div class="metric-value" id="metricHR">-- <small>BPM</small></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Stress Level</div>
+        <div class="metric-value" id="metricStress">-- <small>%</small></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Baseline HR</div>
+        <div class="metric-value" id="metricBaseline">-- <small>BPM</small></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Difficulty</div>
+        <div class="metric-value" id="metricDifficulty">--</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Duration</div>
+        <div class="metric-value" id="metricDuration">00:00</div>
+      </div>
+    </div>
+
+    <!-- Calibration Bar -->
+    <div class="calibration-bar" id="calibrationBar">
+      <div class="calibration-label">Calibration Progress</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="calibrationFill" style="width:0%"></div>
+      </div>
+      <span class="calibration-text" id="calibrationText">0 / 10 readings</span>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+      <div class="chart-container">
+        <h3>Heart Rate (BPM)</h3>
+        <canvas id="hrChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Stress Level (%)</h3>
+        <canvas id="stressChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Bottom Row: Events + Controls -->
+    <div class="bottom-row">
+      <div class="events-panel">
+        <h3>Game Events</h3>
+        <div class="events-list" id="eventsList">
+          <div class="event-empty">Waiting for game events...</div>
+        </div>
+      </div>
+      <div class="controls-panel">
+        <h3>Session Controls</h3>
+        <button class="btn btn-secondary" id="btnCalibrate">Start Calibration</button>
+        <button class="btn btn-danger" id="btnEndSession">End Session</button>
+        <hr>
+        <h3>Simulation</h3>
+        <div class="sim-group">
+          <label for="simHR">Heart Rate</label>
+          <input type="number" id="simHR" value="75" min="40" max="200">
+          <button class="btn btn-outline" id="btnSimSensor">Send Reading</button>
+        </div>
+        <button class="btn btn-outline" id="btnSimBurst">Simulate Stress Burst</button>
+        <button class="btn btn-outline" id="btnSimCalm">Simulate Calm Session</button>
+        <hr>
+        <h3>Simulate Game Event</h3>
+        <select id="simEventType">
+          <option value="enemy_encounter">Enemy Encounter</option>
+          <option value="jump_scare">Jump Scare</option>
+          <option value="puzzle_start">Puzzle Start</option>
+          <option value="puzzle_complete">Puzzle Complete</option>
+          <option value="safe_zone">Safe Zone</option>
+          <option value="level_change">Level Change</option>
+          <option value="player_death">Player Death</option>
+          <option value="game_over">Game Over</option>
+        </select>
+        <button class="btn btn-outline" id="btnSimEvent">Send Event</button>
+      </div>
+    </div>
+
+    <!-- Report Section -->
+    <div class="report-panel" id="reportPanel" style="display:none;">
+      <h2>Session Report</h2>
+      <div class="report-grid" id="reportGrid"></div>
+      <div class="report-insight" id="reportInsight"></div>
+    </div>
+
+  </section>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

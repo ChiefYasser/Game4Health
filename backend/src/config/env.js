@@ -6,6 +6,8 @@ const env = {
   MONGODB_URI: process.env.MONGODB_URI,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   NODE_ENV: process.env.NODE_ENV || 'development',
+  MQTT_BROKER_URL: process.env.MQTT_BROKER_URL || 'mqtt://broker.hivemq.com',
+  MQTT_TOPIC_PREFIX: process.env.MQTT_TOPIC_PREFIX || 'ihealthpass',
 };
 
 // Validate required vars

@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import { handleSensorConnection } from './sensorHandler.js';
 import { handleGameConnection } from './gameHandler.js';
+import { handleDashboardConnection } from './dashboardHandler.js';
 
 let io;
 
@@ -17,7 +18,11 @@ export const initSocket = (httpServer) => {
   const gameNsp = io.of('/game');
   gameNsp.on('connection', handleGameConnection);
 
-  console.log('Socket.io initialized with /sensor and /game namespaces');
+  // Dashboard namespace — frontend dashboard connects here
+  const dashNsp = io.of('/dashboard');
+  dashNsp.on('connection', handleDashboardConnection);
+
+  console.log('Socket.io initialized with /sensor, /game, and /dashboard namespaces');
   return io;
 };
 

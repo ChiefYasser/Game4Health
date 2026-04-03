@@ -2,6 +2,7 @@ import Session from '../models/Session.js';
 import GameEvent from '../models/GameEvent.js';
 import { getActiveSession, setSocket, removeSocket } from '../services/sessionManager.js';
 import { generateReport } from '../services/reportService.js';
+import { getIO } from './index.js';
 
 export const handleGameConnection = (socket) => {
   console.log(`Game connected: ${socket.id}`);
@@ -47,6 +48,17 @@ export const handleGameConnection = (socket) => {
       });
 
       socket.emit('event-saved', { eventType, eventId: event._id });
+
+      // Notify dashboard of game event
+      const io = getIO();
+      io.of('/dashboard').to(sessionId).emit('game-event', {
+        eventType,
+        data: eventData || {},
+        heartRateAtEvent: active?.lastHR || null,
+        stressAtEvent: active?.lastStress || null,
+        timestamp: new Date().toISOString(),
+      });
+
       console.log(`Game event: ${eventType} for session ${sessionId}`);
     } catch (err) {
       console.error('Game event error:', err.message);
@@ -69,6 +81,11 @@ export const handleGameConnection = (socket) => {
       // Generate report
       const report = await generateReport(sessionId);
       socket.emit('session-report', report);
+
+      // Notify dashboard
+      const io = getIO();
+      io.of('/dashboard').to(sessionId).emit('session-report', report);
+
       console.log(`Session ${sessionId} ended`);
     } catch (err) {
       console.error('End session error:', err.message);

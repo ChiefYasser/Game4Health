@@ -33,6 +33,21 @@ router.post('/simulate-sensor', async (req, res) => {
         session.startedAt = new Date();
         await session.save();
         phase = 'active';
+
+        try {
+          const io = getIO();
+          io.of('/dashboard').to(sessionId).emit('calibration-complete', { baselineHR });
+          io.of('/game').to(sessionId).emit('calibration-complete', { baselineHR });
+        } catch (e) { /* no clients */ }
+      } else {
+        try {
+          const io = getIO();
+          const active = getActiveSession(sessionId);
+          io.of('/dashboard').to(sessionId).emit('calibration-progress', {
+            readings: active.calibrationData.length,
+            needed: 10,
+          });
+        } catch (e) { /* no clients */ }
       }
     }
 
@@ -44,14 +59,16 @@ router.post('/simulate-sensor', async (req, res) => {
       // Broadcast stress update to the game namespace
       try {
         const io = getIO();
-        io.of('/game').to(sessionId).emit('stress-update', {
+        const stressUpdate = {
           sessionId,
           heartRate,
           stressScore,
           difficulty: stressScore < 30 ? 'easy' : stressScore < 65 ? 'medium' : 'hard',
           timestamp: new Date().toISOString(),
-        });
-      } catch (e) { /* game not connected, that's ok */ }
+        };
+        io.of('/game').to(sessionId).emit('stress-update', stressUpdate);
+        io.of('/dashboard').to(sessionId).emit('stress-update', stressUpdate);
+      } catch (e) { /* no clients connected */ }
     }
 
     // Save reading
@@ -96,6 +113,18 @@ router.post('/simulate-game-event', async (req, res) => {
       heartRateAtEvent: activeSession?.lastHR || null,
       stressAtEvent: activeSession?.lastStress || null,
     });
+
+    // Notify dashboard
+    try {
+      const io = getIO();
+      io.of('/dashboard').to(sessionId).emit('game-event', {
+        eventType,
+        data: data || {},
+        heartRateAtEvent: activeSession?.lastHR || null,
+        stressAtEvent: activeSession?.lastStress || null,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (e) { /* no clients */ }
 
     res.json({ message: 'Simulated game event saved', event });
   } catch (err) {

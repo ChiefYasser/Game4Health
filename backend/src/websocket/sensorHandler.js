@@ -54,14 +54,20 @@ export const handleSensorConnection = (socket) => {
 
           socket.emit('calibration-complete', { baselineHR });
 
-          // Notify game that calibration is done
+          // Notify game and dashboard that calibration is done
           const io = getIO();
           io.of('/game').to(sessionId).emit('calibration-complete', { baselineHR });
+          io.of('/dashboard').to(sessionId).emit('calibration-complete', { baselineHR });
 
           phase = 'active';
         } else {
           const active = getActiveSession(sessionId);
           socket.emit('calibration-progress', {
+            readings: active.calibrationData.length,
+            needed: 10,
+          });
+          const ioProgress = getIO();
+          ioProgress.of('/dashboard').to(sessionId).emit('calibration-progress', {
             readings: active.calibrationData.length,
             needed: 10,
           });
@@ -85,6 +91,7 @@ export const handleSensorConnection = (socket) => {
         };
 
         io.of('/game').to(sessionId).emit('stress-update', stressUpdate);
+        io.of('/dashboard').to(sessionId).emit('stress-update', stressUpdate);
         socket.emit('stress-update', stressUpdate); // Echo back to sensor too
       }
 

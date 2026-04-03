@@ -1,16 +1,22 @@
 import express from 'express';
 import cors from 'cors';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import healthRoutes from './routes/healthRoutes.js';
 import sessionRoutes from './routes/sessionRoutes.js';
 import questionnaireRoutes from './routes/questionnaireRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import debugRoutes from './routes/debugRoutes.js';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve frontend static files
+app.use(express.static(join(__dirname, '../../frontend')));
 
 // Routes
 app.use('/api/health', healthRoutes);
